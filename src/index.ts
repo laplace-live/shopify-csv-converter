@@ -1,4 +1,6 @@
 import { parseArgs } from 'util'
+import { consola } from 'consola'
+
 import type { ShopifyOrderExportItem } from './types/main'
 
 // https://docs.sheetjs.com/docs/getting-started/installation/bun/
@@ -54,7 +56,7 @@ const worksheet = wb.Sheets[wb.SheetNames[0]]
 
 // Convert to JSON
 const json = XLSX.utils.sheet_to_json<ShopifyOrderExportItem>(worksheet)
-console.log(`Got ${json.length} item${json.length > 1 && 's'}`)
+consola.start(`Got ${json.length} item${json.length > 1 && 's'}`)
 
 const processedJson = preprocessRow(json)
 
@@ -74,7 +76,7 @@ const filteredData = processedJson
     下单数量: row['Lineitem quantity'],
   }))
 
-console.log(`Found ${filteredData.length} valid item${filteredData.length > 1 && 's'}`)
+consola.start(`Found ${filteredData.length} valid item${filteredData.length > 1 && 's'}`)
 
 // Extract the desired column (e.g., 'address')
 const newWb = XLSX.utils.book_new()
@@ -82,4 +84,4 @@ const newWorksheet = XLSX.utils.json_to_sheet(filteredData)
 XLSX.utils.book_append_sheet(newWb, newWorksheet, 'Filtered Data')
 
 XLSX.writeFile(newWb, outputFilename)
-console.log(`Generated sheet: ${outputFilename}`)
+consola.success(`Generated sheet: ${outputFilename}`)
