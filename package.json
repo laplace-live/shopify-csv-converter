@@ -1,13 +1,8 @@
 {
   "name": "@laplace.live/shopify-csv-converter",
   "version": "1.0.4",
-  "module": "dist/index.ts",
   "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js"
-    }
-  },
+  "main": "dist/index.ts",
   "files": [
     "dist"
   ],
