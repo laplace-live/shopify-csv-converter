@@ -1,7 +1,7 @@
 {
   "name": "@laplace.live/shopify-csv-converter",
   "version": "1.0.2",
-  "module": "src/index.ts",
+  "module": "dist/index.ts",
   "type": "module",
   "files": [
     "dist"
