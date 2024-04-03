@@ -3,6 +3,11 @@
   "version": "1.0.3",
   "module": "dist/index.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
