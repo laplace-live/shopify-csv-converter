@@ -14,6 +14,9 @@ const { values: args, positionals } = parseArgs({
     output: {
       type: 'string',
     },
+    orderId: {
+      type: 'boolean',
+    },
   },
   strict: true,
   allowPositionals: true,
@@ -63,7 +66,7 @@ const filteredData = processedJson
   })
   // Map keys
   .map((row) => ({
-    第三方订单号: `SHOPIFY:${row['Name'].replace('#', '')}`,
+    第三方订单号: args.orderId ? `SHOPIFY:${row['Name'].replace('#', '')}` : '',
     收件人: row['Shipping Name'],
     联系电话: row['Shipping Phone'],
     收件地址: rouzaoAddress(row),
