@@ -1,11 +1,14 @@
 {
   "name": "@laplace.live/shopify-csv-converter",
   "version": "1.0.1",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build ./src/index.ts --outdir ./build --target bun"
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun"
   },
   "devDependencies": {
     "@types/bun": "latest",
