@@ -1,4 +1,4 @@
-# laplace-shopify-csv-converter
+# LAPLACE Shopify CSV Converter
 
 Convert Shopify exported CSV to external providers
 
