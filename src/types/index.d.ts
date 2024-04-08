@@ -61,7 +61,10 @@ export interface ShopifyOrderExportItem {
    * 'CN'
    */
   'Shipping Country'?: string
-  'Shipping Phone'?: number
+  /**
+   * can be string: `133 3333 3333` or number `13333333333` or number with country prefix `8613333333333`
+   */
+  'Shipping Phone'?: string | number
   'Payment Method'?: string
   'Payment Reference'?: string
   'Refunded Amount'?: number

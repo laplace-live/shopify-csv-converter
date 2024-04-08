@@ -2,9 +2,25 @@ import { parseArgs } from 'util'
 import { consola } from 'consola'
 
 import type { ShopifyOrderExportItem } from './types'
+import { preprocessRow } from './utils/preprocessRow'
+import { rouzaoAddress } from './utils/rouzaoAddress'
+import { rouzaoPhone } from './utils/rouzaoPhone'
 
 // https://docs.sheetjs.com/docs/getting-started/installation/bun/
 import * as XLSX from 'xlsx'
+
+/* load 'fs' for readFile and writeFile support */
+import * as fs from 'fs'
+XLSX.set_fs(fs)
+
+/* load 'stream' for stream support */
+import { Readable } from 'stream'
+
+XLSX.stream.set_readable(Readable)
+
+/* load the codepage support library for extended support with older formats  */
+// import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs'
+// XLSX.set_cptable(cpexcel)
 
 // https://bun.sh/guides/process/argv
 const { values: args, positionals } = parseArgs({
@@ -29,20 +45,6 @@ if (!args.input) {
 }
 
 const outputFilename = args.output || 'output.xlsx'
-
-/* load 'fs' for readFile and writeFile support */
-import * as fs from 'fs'
-XLSX.set_fs(fs)
-
-/* load 'stream' for stream support */
-import { Readable } from 'stream'
-import { preprocessRow } from './utils/preprocessRow'
-import { rouzaoAddress } from './utils/rouzaoAddress'
-XLSX.stream.set_readable(Readable)
-
-/* load the codepage support library for extended support with older formats  */
-// import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs'
-// XLSX.set_cptable(cpexcel)
 
 const filePath = args.input
 const data = await Bun.file(filePath).text()
@@ -70,7 +72,7 @@ const filteredData = processedJson
   .map((row) => ({
     第三方订单号: args.orderId ? `SHOPIFY:${row['Name'].replace('#', '')}` : '',
     收件人: row['Shipping Name'],
-    联系电话: row['Shipping Phone'],
+    联系电话: rouzaoPhone(row['Shipping Phone'] || ''),
     收件地址: rouzaoAddress(row),
     商家编码: row['Lineitem sku'],
     下单数量: row['Lineitem quantity'],
