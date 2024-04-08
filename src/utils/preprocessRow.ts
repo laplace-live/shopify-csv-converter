@@ -1,4 +1,4 @@
-import type { ShopifyOrderExportItem } from '../types/main'
+import type { ShopifyOrderExportItem } from '../types'
 
 /**
  * Fill Shopify export with missing field for order with multiple items

@@ -1,7 +1,7 @@
 import { parseArgs } from 'util'
 import { consola } from 'consola'
 
-import type { ShopifyOrderExportItem } from './types/main'
+import type { ShopifyOrderExportItem } from './types'
 
 // https://docs.sheetjs.com/docs/getting-started/installation/bun/
 import * as XLSX from 'xlsx'
