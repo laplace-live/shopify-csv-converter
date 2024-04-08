@@ -3,38 +3,38 @@ import type { ShopifyOrderExportItem } from '../types'
 /**
  * Fill Shopify export with missing field for order with multiple items
  * @param data
- * @returns
+ * @returns ShopifyOrderExportItem[]
  */
 export function preprocessRow(data: ShopifyOrderExportItem[]) {
-  const orderMap: {
-    [order: string]: {
-      name: string
-      phone: number
-      province: string
-      city: string
-      street: string
-    }
-  } = {}
+  const orderMap: { [order: string]: ShopifyOrderExportItem } = {}
+  const enrichedData: ShopifyOrderExportItem[] = []
 
   for (const row of data) {
     const orderId = row['Name']
 
+    // Store order ID with full details
     if (!orderMap[orderId]) {
-      orderMap[orderId] = {
-        name: row['Shipping Name'] || '',
-        phone: row['Shipping Phone'] || 0,
-        province: row['Shipping Province'] || '',
-        city: row['Shipping City'] || '',
-        street: row['Shipping Street'] || '',
-      }
-    } else {
-      row['Shipping Name'] = row['Shipping Name'] || orderMap[orderId].name
-      row['Shipping Phone'] = row['Shipping Phone'] || orderMap[orderId].phone
-      row['Shipping Province'] = row['Shipping Province'] || orderMap[orderId].province
-      row['Shipping City'] = row['Shipping City'] || orderMap[orderId].city
-      row['Shipping Street'] = row['Shipping Street'] || orderMap[orderId].street
+      orderMap[orderId] = { ...row }
+    }
+
+    // Extract SKUs
+    const skus = row['Lineitem sku'].split(',')
+
+    for (const sku of skus) {
+      // Create a new row for each SKU with details
+      const newRow = { ...orderMap[orderId], 'Lineitem sku': sku }
+
+      // Fill the missing fields
+      newRow['Shipping Name'] = newRow['Shipping Name'] || orderMap[orderId]['Shipping Name']
+      newRow['Shipping Phone'] = newRow['Shipping Phone'] || orderMap[orderId]['Shipping Phone']
+      newRow['Shipping Province'] =
+        newRow['Shipping Province'] || orderMap[orderId]['Shipping Province']
+      newRow['Shipping City'] = newRow['Shipping City'] || orderMap[orderId]['Shipping City']
+      newRow['Shipping Street'] = newRow['Shipping Street'] || orderMap[orderId]['Shipping Street']
+
+      enrichedData.push(newRow)
     }
   }
 
-  return data
+  return enrichedData
 }
