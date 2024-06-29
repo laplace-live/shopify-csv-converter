@@ -32,6 +32,9 @@ export function preprocessRow(data: ShopifyOrderExportItem[]) {
       newRow['Shipping City'] = newRow['Shipping City'] || orderMap[orderId]['Shipping City']
       newRow['Shipping Street'] = newRow['Shipping Street'] || orderMap[orderId]['Shipping Street']
 
+      // Inherit quantity from parent
+      newRow['Lineitem quantity'] = row['Lineitem quantity']
+
       enrichedData.push(newRow)
     }
   }
