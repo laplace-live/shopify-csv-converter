@@ -10,6 +10,9 @@ export interface ShopifyOrderExportItem {
    */
   'Created at': number
   'Lineitem quantity': number
+  /**
+   * 商品名称
+   */
   'Lineitem name': string
   'Lineitem price': number
   'Lineitem compare at price': number
