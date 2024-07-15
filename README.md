@@ -5,6 +5,7 @@ Convert Shopify exported CSV to external providers
 ## Supported Providers
 
 - Rouzao
+- General providers (马帮, 芒果店长, etc.)
 
 ## Development
 
