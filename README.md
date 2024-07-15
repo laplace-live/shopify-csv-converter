@@ -7,6 +7,12 @@ Convert Shopify exported CSV to external providers
 - Rouzao
 - General providers (马帮, 芒果店长, etc.)
 
+## Usage
+
+```bash
+bun run src/index.ts --input '/path/to/exported.csv'
+```
+
 ## Development
 
 To install dependencies:
