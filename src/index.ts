@@ -60,7 +60,7 @@ providers.forEach((provider) => {
     // Filter out the necessary columns
     .filter((row) => {
       // sku can be empty
-      return row['Lineitem sku'] && row['Lineitem sku'].startsWith(provider)
+      return row['Lineitem sku'] && row['Lineitem sku'].startsWith(provider) && !row['Cancelled at']
     })
     // Map keys
     .map((row, idx) => {

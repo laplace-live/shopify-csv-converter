@@ -68,6 +68,10 @@ export interface ShopifyOrderExportItem {
    * can be string: `133 3333 3333` or number `13333333333` or number with country prefix `8613333333333`
    */
   'Shipping Phone'?: string | number
+  /**
+   * If the order is cancelled, this field will be filled
+   */
+  'Cancelled at'?: string
   'Payment Method'?: string
   'Payment Reference'?: string
   'Refunded Amount'?: number
