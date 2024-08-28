@@ -54,6 +54,7 @@ const processedJson = preprocessRow(json)
 
 const providersString = process.env.PROVIDERS || ''
 const providers = providersString.split(',')
+const orderPrefix = process.env.ORDER_PREFIX || 'SHOPIFY'
 
 providers.forEach((provider) => {
   const filteredData = processedJson
@@ -65,7 +66,7 @@ providers.forEach((provider) => {
     // Map keys
     .map((row, idx) => {
       const isRouzao = row['Lineitem sku'] && row['Lineitem sku'].startsWith('ROUZAO_')
-      const orderId = args.orderId ? args.orderId : `SHOPIFY${row['Name']}`
+      const orderId = args.orderId ? args.orderId : `${orderPrefix}${row['Name']}`
       const addObj = processAddr(row)
 
       if (isRouzao) {
