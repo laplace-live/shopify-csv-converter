@@ -48,9 +48,12 @@ const worksheet = wb.Sheets[wb.SheetNames[0]]
 
 // Convert to JSON
 const json = XLSX.utils.sheet_to_json<ShopifyOrderExportItem>(worksheet)
-consola.start(`Got ${json.length} item${json.length > 1 && 's'}`)
 
-const processedJson = preprocessRow(json)
+// Filter out rows without SKU
+const resolvedJson = json.filter((row) => row['Lineitem sku'])
+consola.start(`Got ${resolvedJson.length} item${resolvedJson.length > 1 && 's'}`)
+
+const processedJson = preprocessRow(resolvedJson)
 
 const providersString = process.env.PROVIDERS || ''
 const providers = providersString.split(',')
