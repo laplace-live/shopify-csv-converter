@@ -1,10 +1,6 @@
 import { parseArgs } from 'util'
 import { consola } from 'consola'
 
-import type { ShopifyOrderExportItem } from './types'
-
-import { preprocessRow } from './utils/preprocessRow'
-
 // https://docs.sheetjs.com/docs/getting-started/installation/bun/
 import * as XLSX from 'xlsx'
 
@@ -14,7 +10,12 @@ XLSX.set_fs(fs)
 
 /* load 'stream' for stream support */
 import { Readable } from 'stream'
+
+import type { ShopifyOrderExportItem } from './types'
+
+import { preprocessRow } from './utils/preprocessRow'
 import { processAddr } from './utils/processAddr'
+import { extractCollection } from './utils/extractCollection'
 
 XLSX.stream.set_readable(Readable)
 
@@ -71,6 +72,8 @@ providers.forEach((provider) => {
       const isRouzao = row['Lineitem sku'] && row['Lineitem sku'].startsWith('ROUZAO_')
       const orderId = args.orderId ? args.orderId : `${orderPrefix}${row['Name']}`
       const addObj = processAddr(row)
+      const collection = extractCollection(row['Lineitem sku'])
+      const resolvedSku = row['Lineitem sku'].replace(/__COLLE:.+$/, '')
 
       if (isRouzao) {
         return {
@@ -78,8 +81,9 @@ providers.forEach((provider) => {
           收件人: row['Shipping Name'],
           联系电话: addObj.rouzaoPhone,
           收件地址: addObj.rouzaoAddr,
-          商家编码: row['Lineitem sku'],
+          商家编码: resolvedSku,
           下单数量: row['Lineitem quantity'],
+          _collection: collection,
         }
       } else {
         return {
@@ -87,7 +91,7 @@ providers.forEach((provider) => {
           '商品编号': `${orderId}-${idx + 1}`,
           '产品信息': row['Lineitem name'],
           '数量': row['Lineitem quantity'],
-          'SKU': row['Lineitem sku'].replace(provider, ''),
+          'SKU': resolvedSku.replace(provider, ''),
           '姓名': row['Shipping Name'],
           '州/省': addObj.prov,
           '城市': addObj.city,
@@ -95,19 +99,44 @@ providers.forEach((provider) => {
           '邮编': addObj.zip,
           '电话2': addObj.phone,
           '收货国家': addObj.country,
+          '_collection': collection,
         }
       }
     })
 
-  if (filteredData.length > 0) {
-    const outputFilename = `output_${provider.toLowerCase()}${new Date().toISOString().slice(0, 10)}.xlsx`
-    const fullPath = args.outputDir ? `${args.outputDir}/${outputFilename}` : outputFilename
-    const newWb = XLSX.utils.book_new()
-    const newWorksheet = XLSX.utils.json_to_sheet(filteredData)
-    XLSX.utils.book_append_sheet(newWb, newWorksheet, `Filtered Data`)
-    XLSX.writeFile(newWb, fullPath)
-    consola.success(`Generated ${fullPath} with ${filteredData.length} items`)
-  } else {
-    consola.info(`No items found for ${provider}`)
-  }
+  // Group data by collection
+  const groupedData = filteredData.reduce(
+    (acc, item) => {
+      const collection = item._collection
+      if (!acc[collection]) {
+        acc[collection] = []
+      }
+      acc[collection].push(item)
+      return acc
+    },
+    {} as Record<string, typeof filteredData>
+  )
+
+  // Generate Excel files for each collection
+  Object.entries(groupedData).forEach(([collection, data]) => {
+    const providerStr = provider.toLowerCase().replace(/_$/g, '')
+
+    if (data.length > 0) {
+      const outputFilename = `${collection}_${providerStr}_${new Date().toISOString().slice(0, 10)}.xlsx`
+      const fullPath = args.outputDir ? `${args.outputDir}/${outputFilename}` : outputFilename
+      const newWb = XLSX.utils.book_new()
+      const newWorksheet = XLSX.utils.json_to_sheet(
+        data.map((item) => {
+          // Remove internal collection field
+          const { _collection, ...rest } = item
+          return rest
+        })
+      )
+      XLSX.utils.book_append_sheet(newWb, newWorksheet, `Filtered Data`)
+      XLSX.writeFile(newWb, fullPath)
+      consola.success(`[${collection}] ${providerStr}: ${data.length} items`)
+    } else {
+      consola.info(`No items found for ${providerStr} in collection: ${collection}`)
+    }
+  })
 })
