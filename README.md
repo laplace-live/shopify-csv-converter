@@ -6,6 +6,7 @@ Convert Shopify exported CSV to external providers
 
 - Rouzao
 - General providers (马帮, 芒果店长, etc.)
+- 金碟管易
 
 ## Usage
 

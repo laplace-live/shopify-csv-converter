@@ -70,6 +70,7 @@ providers.forEach((provider) => {
     // Map keys
     .map((row, idx) => {
       const isRouzao = row['Lineitem sku'] && row['Lineitem sku'].startsWith('ROUZAO_')
+      const isGuanyi = row['Lineitem sku'] && row['Lineitem sku'].startsWith('SUBSPACE_WH1_')
       const orderId = args.orderId ? args.orderId : `${orderPrefix}${row['Name']}`
       const addObj = processAddr(row)
       const collection = extractCollection(row['Lineitem sku'])
@@ -85,22 +86,42 @@ providers.forEach((provider) => {
           下单数量: row['Lineitem quantity'],
           _collection: collection,
         }
-      } else {
+      }
+
+      if (isGuanyi) {
         return {
-          '订单ID': orderId,
-          '商品编号': `${orderId}-${idx + 1}`,
-          '产品信息': row['Lineitem name'],
-          '数量': row['Lineitem quantity'],
-          'SKU': resolvedSku.replace(provider, ''),
-          '姓名': row['Shipping Name'],
-          '州/省': addObj.prov,
-          '城市': addObj.city,
-          '地址1': addObj.street,
-          '邮编': addObj.zip,
-          '电话2': addObj.phone,
-          '收货国家': addObj.country,
-          '_collection': collection,
+          店铺: orderPrefix,
+          平台单号: orderId,
+          买家会员: row['Email'],
+          支付金额: row['Total'],
+          商品名称: row['Lineitem name'],
+          商品代码: resolvedSku.replace(provider, ''),
+          数量: row['Lineitem quantity'],
+          价格: row['Lineitem price'],
+          收货人: row['Shipping Name'],
+          联系电话: addObj.rouzaoPhone,
+          收货地址: addObj.rouzaoAddr,
+          省: addObj.prov,
+          市: addObj.city,
+          _collection: collection,
         }
+      }
+
+      // General provider
+      return {
+        '订单ID': orderId,
+        '商品编号': `${orderId}-${idx + 1}`,
+        '产品信息': row['Lineitem name'],
+        '数量': row['Lineitem quantity'],
+        'SKU': resolvedSku.replace(provider, ''),
+        '姓名': row['Shipping Name'],
+        '州/省': addObj.prov,
+        '城市': addObj.city,
+        '地址1': addObj.street,
+        '邮编': addObj.zip,
+        '电话2': addObj.phone,
+        '收货国家': addObj.country,
+        '_collection': collection,
       }
     })
 
